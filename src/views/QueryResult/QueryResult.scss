@@ -36,6 +36,9 @@
     border-bottom: 1px solid #ededed;
     padding-bottom: 20px;
     cursor: pointer;
+    &:last-child{
+        border-bottom: 0;
+    }
 }
 
 @media only screen and (min-width: 768px) {
