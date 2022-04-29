@@ -1,7 +1,48 @@
 import "./ProductDetail.scss";
 import largeProduct from './../../assets/alfombra.jpg';
+import { sortCategories } from '../../helpers/sortCategories';
+import { DetailResultInterface } from './../../services/handlerServicesResponse/Interfaces/productDetailInterface';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { details, descriptions } from './../../services/connections';
+import { sortResultDetail } from './../../services/handlerServicesResponse/Interfaces/sortResultDetail';
+
+const DetailState: DetailResultInterface = {
+  author: {
+    name: "",
+    lastname: "",
+  },
+  item: {
+    id: "",
+    title: "",
+    price: {
+      currency: "",
+      amount: 0,
+    },
+    picture: "",
+    condition: "",
+    free_shipping: false,
+    sold_quantity: 0,
+    description: "",
+  },
+};
 
 export const ProductDetail = () => {
+  const [detailResultState, setDetailResultState] =
+  useState<DetailResultInterface>(DetailState);
+  let params = useParams() as any;
+
+  useEffect(() => {
+    service();
+  }, []);
+
+const service = async () => {
+  const [detail, description] = await Promise.all([
+    details(params.id),
+    descriptions(params.id),
+  ]);
+  setDetailResultState(sortResultDetail(detail, description));
+};
 
   return (
     <div className="details">
@@ -15,34 +56,22 @@ export const ProductDetail = () => {
           <div className="row">
             <div className="col-md-8">
               <img
-                src={largeProduct}
+                src={detailResultState.item.picture}
                 alt="itemProduct"
                 className="largeImageProduct"
               />
               <div className="infoProduct">
                 <h3>Descripción del producto</h3>
-                <p>
-                  Contrary to popular belief, Lorem Ipsum is not simply random
-                  text. It has roots in a piece of classical Latin literature
-                  from 45 BC, making it over 2000 years old. Richard McClintock,
-                  a Latin professor at Hampden-Sydney College in Virginia,
-                  looked up one of the more obscure Latin words, consectetur,
-                  from a Lorem Ipsum passage, and going through the cites of the
-                  word in classical literature, discovered the undoubtable
-                  source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of
-                  "de Finibus Bonorum et Malorum" (The Extremes of Good and
-                  Evil) by Cicero, written in 45 BC. This book is a treatise on
-                  the theory of ethics, very popular during the Renaissance. The
-                  first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..",
-                  comes from a line in section 1.10.32.
-                </p>
+                <p>{detailResultState.item.description}</p>
               </div>
             </div>
             <div className="col-md-4">
-              <p className="shortDescription">NUEVO - 234 vendidos</p>
-              <p className="largeDescription">Deco Reverse Sombre Oxford</p>
-              <p className="largePrice">$ 1.980</p>
+              <div className="detailsProductDescription">
+                <p className="shortDescription">{detailResultState.item.sold_quantity} vendidos</p>
+                <p className="largeDescription">{detailResultState.item.title}</p>
+                <p className="largePrice"> $ {detailResultState.item.price.amount}</p>
               <button className="btn btn-primary btn-meli">Comprar</button>
+              </div>
             </div>
           </div>
         </div>
